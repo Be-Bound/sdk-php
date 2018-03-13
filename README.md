@@ -2,8 +2,8 @@
 
 Simple library to implement Be-Bound on a PHP 7 backend
 
+[![Build Status](https://img.shields.io/travis/Be-Bound/sdk-php/master.svg)](https://travis-ci.org/Be-Bound/sdk-php)
 [![Latest Stable Version](https://img.shields.io/packagist/v/bebound/sdk-php.svg)](https://packagist.org/packages/bebound/sdk-php)
-[![Build Status](https://status.continuousphp.com/git-hub/Be-Bound/sdk-php?token=8d984614-c230-4d46-8435-d8d2d76de044&branch=master)](https://continuousphp.com/git-hub/Be-Bound/sdk-php)
 [![GitHub issues](https://img.shields.io/github/issues/Be-Bound/sdk-php.svg)](https://github.com/Be-Bound/sdk-phpissues)
 [![License](https://img.shields.io/packagist/l/bebound/sdk-php.svg)](https://packagist.org/packages/bebound/sdk-php)
 
