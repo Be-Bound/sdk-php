@@ -47,6 +47,11 @@ clean_build:
 	@echo Clean temporary build folder...
 	@test ! -e .build || rm -r .build
 
+.PHONY: csfix
+csfix:
+	@echo PHPCS: fix code style...
+	@$(PHP_BIN) ./vendor/bin/phpcbf --standard=PSR2 --colors $(SRCS)
+
 phpunit.xml:
 	@echo Creating Local PHPUnit configuration...
 	@cp phpunit.dist.xml phpunit.xml
@@ -67,14 +72,13 @@ $(TMP_DIR)/phpstan.lock: $(TMP_DIR) vendor/autoload.php $(src)
 
 $(TMP_DIR)/phpunit.lock: $(TMP_DIR) vendor/autoload.php phpunit.xml $(src)
 	@echo Testing...
-	@$(PHP_BIN) ./vendor/bin/phpunit --configuration phpunit.xml
+	@$(PHP_BIN) ./vendor/bin/phpunit --configuration phpunit.xml --testdox
 	@touch $@
 
 $(TMP_DIR)/phpcs.lock: $(TMP_DIR) vendor/autoload.php $(src)
 	@echo PHPCS: analyses code style...
 	@$(PHP_BIN) ./vendor/bin/phpcs --standard=PSR2 -s --colors --warning-severity=$(PHPCS_WARNING) $(SRCS)
 	@touch $@
-
 
 vendor/autoload.php: composer.lock
 	@echo Composer installing...
