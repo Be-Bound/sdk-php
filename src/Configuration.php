@@ -11,11 +11,17 @@ class Configuration
     private $beappId;
     private $beappVersion;
     private $beappSecret;
+    private $debug = false;
 
     private $logger;
 
-    public function __construct(string $beappName, int $beappId, int $beappVersion, string $beappSecret, ?LoggerInterface $logger = null)
-    {
+    public function __construct(
+        string $beappName,
+        int $beappId,
+        int $beappVersion,
+        string $beappSecret,
+        ?LoggerInterface $logger = null
+    ) {
         $this->beappName = $beappName;
         $this->beappId = $beappId;
         $this->beappVersion = $beappVersion;
@@ -47,5 +53,10 @@ class Configuration
     public function getBeappSecret(): string
     {
         return $this->beappSecret;
+    }
+
+    public function isDebug(): bool
+    {
+        return $this->debug;
     }
 }
