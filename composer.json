@@ -10,6 +10,16 @@
     }
   ],
   "minimum-stability": "stable",
+  "keywords": [
+    "Be-Bound",
+    "N4B",
+    "PSR-15",
+    "Webhook",
+    "Push",
+    "SDK",
+    "Middleware",
+    "Handler"
+  ],
   "config": {
     "sort-packages": true
   },
