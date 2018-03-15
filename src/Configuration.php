@@ -59,4 +59,18 @@ class Configuration
     {
         return $this->debug;
     }
+
+    public function enableDebug(): self
+    {
+        $this->debug = true;
+
+        return $this;
+    }
+
+    public function disableDebug(): self
+    {
+        $this->debug = false;
+
+        return $this;
+    }
 }

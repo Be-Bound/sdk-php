@@ -3,16 +3,11 @@
 namespace Test\Unit;
 
 use BeBound\SDK\Configuration;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Test\WebhookBaseTest;
 
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends WebhookBaseTest
 {
-    public const BEAPP_NAME = 'beappName';
-    public const BEAPP_ID = 13;
-    public const BEAPP_VERSION = 2;
-    public const BEAPP_SECRET = 'Sup3rS3cr3tch41n';
-
     /**
      * @test
      */
@@ -34,6 +29,22 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(self::BEAPP_ID, $subject->getBeappId());
         $this->assertEquals(self::BEAPP_VERSION, $subject->getBeappVersion());
         $this->assertEquals(self::BEAPP_SECRET, $subject->getBeappSecret());
+    }
+
+    /**
+     * @test
+     */
+    public function configurationDebugModeIsSettable(): void
+    {
+        $subject = $this->getConfiguration();
+
+        $this->assertFalse($subject->isDebug());
+
+        $subject->enableDebug();
+        $this->assertTrue($subject->isDebug());
+
+        $subject->disableDebug();
+        $this->assertFalse($subject->isDebug());
     }
 
     private function getConfiguration(): Configuration

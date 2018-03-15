@@ -32,6 +32,7 @@ class WebhookHandlerTest extends WebhookBaseTest
         array $responsePayload
     ): void {
         $configuration = $this->instantiateConfiguration(
+            false,
             $beappName,
             $beappId,
             $beappVersion,
