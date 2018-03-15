@@ -5,8 +5,11 @@
          colors="true"
          verbose="true">
     <testsuites>
-        <testsuite name="Default Test Suite">
-            <directory>tests</directory>
+        <testsuite name="Unitary Tests Suite">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Functional Tests Suite">
+            <directory>tests/Functional</directory>
         </testsuite>
     </testsuites>
     <filter>

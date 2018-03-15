@@ -2,84 +2,16 @@
 
 namespace Test\Unit;
 
-use BeBound\SDK\Configuration;
 use BeBound\SDK\Webhook\Failure;
-use BeBound\SDK\Webhook\Request;
 use BeBound\SDK\WebhookHandler;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Test\WebhookBaseTest;
 
-class WebhookHandlerTest extends TestCase
+class WebhookHandlerTest extends WebhookBaseTest
 {
-    public const BEAPP_NAME = 'beappName';
-    public const BEAPP_ID = 13;
-    public const BEAPP_VERSION = 2;
-    public const BEAPP_SECRET = 'Sup3rS3cr3tch41n';
-    public const OPERATION_NAME = 'myOperation';
-
-    /**
-     * @test
-     * @dataProvider provideRequest
-     * @param int $expectedResponseCode
-     * @param string $operationName
-     * @param callable $handler
-     * @param array $responsePayload
-     */
-    public function webhookShouldHandleRequest(
-        int $expectedResponseCode,
-        string $operationName,
-        callable $handler,
-        array $responsePayload
-    ): void {
-        $configuration = $this->instantiateConfiguration();
-
-        $streamResponse = $this->prophesize(StreamInterface::class);
-        $streamResponse->write(Argument::exact(\json_encode($responsePayload)))->shouldBeCalled();
-        $response = $this->prophesize(ResponseInterface::class);
-        $response->withStatus(Argument::exact($expectedResponseCode))->willReturn($response);
-        $response->getBody()->willReturn($streamResponse->reveal());
-
-        $streamRequest = $this->prophesize(StreamInterface::class);
-        $streamRequest->getContents()->willReturn($this->createRequestData());
-        $request = $this->prophesize(ServerRequestInterface::class);
-        $request->getBody()->willReturn($streamRequest->reveal());
-        $request->getHeaderLine('Authorization')->willReturn($this->createBasicAuth(
-            self::BEAPP_NAME,
-            self::BEAPP_SECRET
-        ));
-
-        $subject = new WebhookHandler($configuration, $response->reveal());
-        $subject->add($operationName, $handler);
-
-        $result = $subject->handle($request->reveal());
-
-        $this->assertInstanceOf(ResponseInterface::class, $result);
-    }
-
-    public function provideRequest(): array
-    {
-        $handlerOK = function (Request $req) {
-            return ['operationName' => $req->getOperationName()];
-        };
-        return [
-            'Success' => [
-                WebhookHandler::HTTP_CODE_OK,
-                self::OPERATION_NAME,
-                $handlerOK,
-                ['params' => ['operationName' => self::OPERATION_NAME]],
-            ],
-            'Operation not found' => [
-                Failure::HTTP_CODE_OPERATION_NOT_FOUND,
-                'otherOperation',
-                $handlerOK,
-                ['error' => Failure::BB_ERROR_METHOD_NOT_FOUND],
-            ],
-        ];
-    }
-
     /**
      * @test
      * @dataProvider provideWrongBeapp
@@ -89,6 +21,7 @@ class WebhookHandlerTest extends TestCase
      * @param string $beappSecret
      * @param int $httpCode
      * @param array $responsePayload
+     * @throws \Throwable
      */
     public function webhookHandlerShouldRejectWrongBeapp(
         string $beappName,
@@ -176,58 +109,5 @@ class WebhookHandlerTest extends TestCase
 
         $subject = new WebhookHandler($configuration, $response->reveal());
         $subject->add(self::OPERATION_NAME, 'notACallable');
-    }
-
-    private function createRequestData(
-        array $params = [],
-        ?int $moduleId = null,
-        ?string $moduleName = null,
-        ?int $moduleVersion = null,
-        ?string $operationName = null
-    ): string {
-        $moduleId = $moduleId ?? self::BEAPP_ID;
-        $moduleName = $moduleName ?? self::BEAPP_NAME;
-        $moduleVersion = $moduleVersion ?? self::BEAPP_VERSION;
-        $operationName = $operationName ?? self::OPERATION_NAME;
-        $format = <<<JSON
-{
-    "transport":"web",
-    "userId":"id",
-    "moduleId":%s,
-    "moduleName":"%s",
-    "moduleVersion":%s,
-    "operation":"%s",
-    "params":%s
-}
-JSON;
-        return sprintf(
-            $format,
-            $moduleId,
-            $moduleName,
-            $moduleVersion,
-            $operationName,
-            json_encode($params)
-        );
-    }
-
-    private function createBasicAuth(string $user = 'user', string $password = 'password'): string
-    {
-        return 'Basic ' . base64_encode(sprintf('%s:%s', $user, $password));
-    }
-
-    private function instantiateConfiguration(
-        ?string $beappName = self::BEAPP_NAME,
-        ?int $beappId = self::BEAPP_ID,
-        ?int $beappVersion = self::BEAPP_VERSION,
-        ?string $beappSecret = self::BEAPP_SECRET
-    ): Configuration {
-        $configuration = new Configuration(
-            $beappName,
-            $beappId,
-            $beappVersion,
-            $beappSecret
-        );
-
-        return $configuration;
     }
 }
