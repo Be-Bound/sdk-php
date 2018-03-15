@@ -23,6 +23,9 @@ class WebhookHandler extends BaseWebhook implements RequestHandlerInterface
         parent::__construct($configuration);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->logger->info('Handle incoming request');

@@ -17,21 +17,29 @@ class WebhookHandlerTest extends WebhookBaseTest
      * @test
      * @dataProvider provideRequest
      * @param int $expectedResponseCode
+     * @param array $expectedResponsePayload
      * @param string $operationName
      * @param callable $handler
-     * @param array $responsePayload
+     * @param bool $debugMode
      * @throws \Throwable
      */
     public function webhookShouldHandleRequest(
         int $expectedResponseCode,
+        array $expectedResponsePayload,
         string $operationName,
         callable $handler,
-        array $responsePayload
+        bool $debugMode
     ): void {
-        $configuration = $this->instantiateConfiguration();
+        if ($debugMode) {
+            $this->expectException(\Throwable::class);
+        }
+
+        $configuration = $this->instantiateConfiguration($debugMode);
 
         $streamResponse = $this->prophesize(StreamInterface::class);
-        $streamResponse->write(Argument::exact(\json_encode($responsePayload)))->shouldBeCalled();
+        if (!$debugMode) {
+            $streamResponse->write(Argument::exact(\json_encode($expectedResponsePayload)))->shouldBeCalled();
+        }
         $response = $this->prophesize(ResponseInterface::class);
         $response->withStatus(Argument::exact($expectedResponseCode))->willReturn($response);
         $response->getBody()->willReturn($streamResponse->reveal());
@@ -58,18 +66,40 @@ class WebhookHandlerTest extends WebhookBaseTest
         $handlerOK = function (Request $req) {
             return ['operationName' => $req->getOperationName()];
         };
+
+        $handlerBug = function (Request $req) {
+            throw new \RuntimeException('Oops');
+            return ['operationName' => $req->getOperationName()];
+        };
+
         return [
             'Success' => [
                 WebhookHandler::HTTP_CODE_OK,
+                ['params' => ['operationName' => self::OPERATION_NAME]],
                 self::OPERATION_NAME,
                 $handlerOK,
-                ['params' => ['operationName' => self::OPERATION_NAME]],
+                false,
             ],
             'Operation not found' => [
                 Failure::HTTP_CODE_OPERATION_NOT_FOUND,
+                ['error' => Failure::BB_ERROR_METHOD_NOT_FOUND],
                 'otherOperation',
                 $handlerOK,
-                ['error' => Failure::BB_ERROR_METHOD_NOT_FOUND],
+                false,
+            ],
+            'Bugged handler in debug' => [
+                Failure::HTTP_CODE_INTERNAL_ERROR,
+                ['error' => Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
+                self::OPERATION_NAME,
+                $handlerBug,
+                true,
+            ],
+            'Bugged handler in production' => [
+                Failure::HTTP_CODE_INTERNAL_ERROR,
+                ['error' => Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
+                self::OPERATION_NAME,
+                $handlerBug,
+                false,
             ],
         ];
     }
