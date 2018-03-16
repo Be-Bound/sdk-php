@@ -6,6 +6,8 @@ use BeBound\SDK\Configuration;
 
 abstract class BaseWebhook
 {
+    public const HTTP_CODE_OK = 200;
+
     protected $configuration;
     protected $logger;
     protected $operations = [];
@@ -56,5 +58,33 @@ abstract class BaseWebhook
         }
 
         return true;
+    }
+
+    /**
+     * @throws \BeBound\SDK\Webhook\Failure
+     */
+    protected function execute(Request $webhookRequest): string
+    {
+        if (!$this->checkAuthorization($webhookRequest)) {
+            $this->logger->notice('The request authorization does not match this webhook');
+            throw Failure::wrongAuthorization();
+        }
+
+        if (!$this->checkOperation($webhookRequest)) {
+            $this->logger->notice(
+                'No callable mapped to this operation',
+                ['operation' => $webhookRequest->getOperationName()]
+            );
+            throw Failure::wrongOperation();
+        }
+
+        $operationResponse = $this->operations[$webhookRequest->getOperationName()]($webhookRequest);
+
+        return \json_encode(['params' => $operationResponse]);
+    }
+
+    protected function formatErrorResponse(string $error): string
+    {
+        return \json_encode(['error' => $error]);
     }
 }

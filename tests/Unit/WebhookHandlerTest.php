@@ -62,46 +62,25 @@ class WebhookHandlerTest extends WebhookBaseTest
 
     public function provideWrongBeapp(): array
     {
-        return [
-            'Wrong BeApp Name' => [
-                'anotherName',
-                self::BEAPP_VERSION,
-                self::BEAPP_VERSION,
-                self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
-            ],
-            'Wrong BeApp ID' => [
-                self::BEAPP_NAME,
-                42,
-                self::BEAPP_VERSION,
-                self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
-            ],
-            'Wrong BeApp Version' => [
-                self::BEAPP_NAME,
-                self::BEAPP_ID,
-                1,
-                self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
-            ],
-            'Wrong BeApp Secret' => [
-                self::BEAPP_NAME,
-                self::BEAPP_ID,
-                self::BEAPP_VERSION,
-                'notTheGoodSecret',
-                Failure::HTTP_CODE_WRONG_AUTHORIZATION,
-                ['error' => Failure::BB_ERROR_AUTHORIZATION]
-            ],
-        ];
+        return array_merge(
+            parent::provideWrongBeapp(),
+            [
+                'Wrong BeApp Secret' => [
+                    self::BEAPP_NAME,
+                    self::BEAPP_ID,
+                    self::BEAPP_VERSION,
+                    'notTheGoodSecret',
+                    Failure::HTTP_CODE_WRONG_AUTHORIZATION,
+                    ['error' => Failure::BB_ERROR_AUTHORIZATION]
+                ],
+            ]
+        );
     }
 
     /**
      * @test
      */
-    public function webhookHandlerShouldRejectWrongHandler(): void
+    public function webhookShouldRejectWrongHandler(): void
     {
         $this->expectException(\TypeError::class);
 

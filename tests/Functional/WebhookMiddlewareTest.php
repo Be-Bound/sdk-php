@@ -2,14 +2,15 @@
 
 namespace Test\Functional;
 
-use BeBound\SDK\WebhookHandler;
+use BeBound\SDK\WebhookMiddleware;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Test\WebhookBaseTest;
 
-class WebhookHandlerTest extends WebhookBaseTest
+class WebhookMiddlewareTest extends WebhookBaseTest
 {
     /**
      * @test
@@ -21,7 +22,7 @@ class WebhookHandlerTest extends WebhookBaseTest
      * @param bool $debugMode
      * @throws \Throwable
      */
-    public function webhookShouldHandleRequest(
+    public function webhookShouldProcessRequest(
         int $expectedResponseCode,
         array $expectedResponsePayload,
         string $operationName,
@@ -51,10 +52,12 @@ class WebhookHandlerTest extends WebhookBaseTest
             self::BEAPP_SECRET
         ));
 
-        $subject = new WebhookHandler($configuration, $response->reveal());
+        $subject = new WebhookMiddleware($configuration, $response->reveal());
         $subject->add($operationName, $handler);
 
-        $result = $subject->handle($request->reveal());
+        $fallback = $this->prophesize(RequestHandlerInterface::class);
+
+        $result = $subject->process($request->reveal(), $fallback->reveal());
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
     }
