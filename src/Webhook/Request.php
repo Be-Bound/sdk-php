@@ -2,7 +2,7 @@
 
 namespace BeBound\SDK\Webhook;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Request
 {
@@ -43,7 +43,7 @@ class Request
         $this->operationParams = $operationParams;
     }
 
-    public static function fromPSR7Request(RequestInterface $request): Request
+    public static function fromPSR7Request(ServerRequestInterface $request): Request
     {
         $data = \json_decode($request->getBody()->getContents(), true);
 
@@ -101,7 +101,7 @@ class Request
         return $this->operationParams;
     }
 
-    private static function parseBasicAuthCredentials(RequestInterface $request): string
+    private static function parseBasicAuthCredentials(ServerRequestInterface $request): string
     {
         $secret = '';
         if (preg_match("/Basic\s+(.*)$/i", $request->getHeaderLine('Authorization'), $matches)) {

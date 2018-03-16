@@ -3,13 +3,14 @@
 namespace BeBound\SDK;
 
 use BeBound\SDK\Webhook\BaseWebhook;
-use BeBound\SDK\Webhook\Request;
 use BeBound\SDK\Webhook\Failure;
+use BeBound\SDK\Webhook\Request;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class WebhookHandler extends BaseWebhook implements RequestHandlerInterface
+class WebhookMiddleware extends BaseWebhook implements MiddlewareInterface
 {
     private $response;
 
@@ -20,19 +21,16 @@ class WebhookHandler extends BaseWebhook implements RequestHandlerInterface
         parent::__construct($configuration);
     }
 
-    /**
-     * @throws \Throwable
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $this->logger->info('Handle incoming request');
+        $this->logger->info('Process incoming request');
 
         try {
             $webhookRequest = Request::fromPSR7Request($request);
 
             if (!$this->checkBeapp($webhookRequest)) {
                 $this->logger->notice('The request is not relevant for this webhook');
-                throw Failure::wrongBeapp();
+                return $handler->handle($request);
             }
 
             $payload = $this->execute($webhookRequest);
