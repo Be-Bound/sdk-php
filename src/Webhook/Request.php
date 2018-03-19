@@ -43,11 +43,35 @@ class Request
         $this->operationParams = $operationParams;
     }
 
-    public static function fromPSR7Request(ServerRequestInterface $request): Request
+    public static function fromPSR7Request(ServerRequestInterface $request): ?Request
     {
         $data = \json_decode($request->getBody()->getContents(), true);
+        if (!$data) {
+            return null;
+        }
 
         $secret = self::parseBasicAuthCredentials($request);
+
+        return new self(
+            $data['moduleName'],
+            $data['moduleId'],
+            $data['moduleVersion'],
+            $secret,
+            $data['userId'],
+            self::TRANSPORT_TYPES[$data['transport']],
+            $data['operation'],
+            $data['params']
+        );
+    }
+
+    public static function fromEnvironment(): ?Request
+    {
+        $data = \json_decode(file_get_contents('php://input'), true);
+        if (!$data) {
+            return null;
+        }
+
+        $secret = $_SERVER ['PHP_AUTH_PW'] ?? '';
 
         return new self(
             $data['moduleName'],
