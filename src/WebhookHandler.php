@@ -30,7 +30,7 @@ class WebhookHandler extends BaseWebhook implements RequestHandlerInterface
         try {
             $webhookRequest = Request::fromPSR7Request($request);
 
-            if (!$this->checkBeapp($webhookRequest)) {
+            if ($webhookRequest === null || !$this->checkBeapp($webhookRequest)) {
                 $this->logger->notice('The request is not relevant for this webhook');
                 throw Failure::wrongBeapp();
             }

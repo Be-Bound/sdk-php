@@ -28,7 +28,7 @@ class WebhookMiddleware extends BaseWebhook implements MiddlewareInterface
         try {
             $webhookRequest = Request::fromPSR7Request($request);
 
-            if (!$this->checkBeapp($webhookRequest)) {
+            if ($webhookRequest === null || !$this->checkBeapp($webhookRequest)) {
                 $this->logger->notice('The request is not relevant for this webhook');
                 return $handler->handle($request);
             }

@@ -21,7 +21,7 @@ class WebhookMiddlewareTest extends WebhookBaseTest
      * @param string $beappSecret
      * @throws \Throwable
      */
-    public function webhookHandlerShouldRejectWrongBeapp(
+    public function webhookMiddlewareShouldRejectWrongBeapp(
         string $beappName,
         int $beappId,
         int $beappVersion,
