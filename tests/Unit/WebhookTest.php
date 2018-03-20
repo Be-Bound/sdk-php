@@ -16,7 +16,7 @@ class WebhookTest extends WebhookBaseTest
      * @param string $beappSecret
      * @throws \Throwable
      */
-    public function webhookMiddlewareShouldRejectWrongBeapp(
+    public function webhookStandaloneShouldRejectWrongBeapp(
         string $beappName,
         int $beappId,
         int $beappVersion,
@@ -32,7 +32,8 @@ class WebhookTest extends WebhookBaseTest
 
         $subject = new Webhook($configuration);
 
-        $response = $subject->run();
+        $webhookRequest = Webhook\Request::fromEnvironment($this->createRequestStream());
+        $response = $subject->run($webhookRequest);
 
         $this->assertEmpty($response);
     }

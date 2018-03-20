@@ -12,7 +12,7 @@ class RequestTest extends WebhookBaseTest
     /**
      * @test
      */
-    public function canBeCreatedFromPsr7ServerRequest()
+    public function canBeCreatedFromPsr7ServerRequest(): void
     {
         $stream = $this->prophesize(StreamInterface::class);
         $stream->getContents()->willReturn($this->createRequestData());
@@ -27,5 +27,18 @@ class RequestTest extends WebhookBaseTest
         $this->assertEquals(Request::TRANSPORT_TYPE_WEB, $subject->getTransportType());
         $this->assertEquals(self::USER_ID, $subject->getUserID());
         $this->assertEquals([], $subject->getOperationParams());
+    }
+
+    /**
+     * @test
+     */
+    public function canBeCreatedFromEnvironment(): void
+    {
+        $stream = $this->createRequestStream();
+
+        $subject = Request::fromEnvironment($stream, self::BEAPP_SECRET);
+
+        $this->assertInstanceOf(Request::class, $subject);
+        $this->assertEquals(self::OPERATION_NAME, $subject->getOperationName());
     }
 }

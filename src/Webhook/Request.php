@@ -45,7 +45,7 @@ class Request
 
     public static function fromPSR7Request(ServerRequestInterface $request): ?Request
     {
-        $data = \json_decode($request->getBody()->getContents(), true);
+        $data = json_decode($request->getBody()->getContents(), true);
         if (!$data) {
             return null;
         }
@@ -64,14 +64,15 @@ class Request
         );
     }
 
-    public static function fromEnvironment(): ?Request
+    public static function fromEnvironment($stream = null, string $secret = null): ?Request
     {
-        $data = \json_decode(file_get_contents('php://input'), true);
+        $stream = $stream ?? fopen('php://input', 'rb');
+        $data = json_decode(fgets($stream), true);
         if (!$data) {
             return null;
         }
 
-        $secret = $_SERVER ['PHP_AUTH_PW'] ?? '';
+        $secret = $secret ?? (string)filter_input(INPUT_SERVER, 'PHP_AUTH_PW', FILTER_SANITIZE_STRING);
 
         return new self(
             $data['moduleName'],
