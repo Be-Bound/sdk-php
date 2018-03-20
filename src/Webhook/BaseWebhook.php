@@ -25,7 +25,7 @@ abstract class BaseWebhook
         return $this;
     }
 
-    protected function checkBeapp(Request $webhookRequest): bool
+    protected function checkBeapp(WebhookRequest $webhookRequest): bool
     {
         if ($webhookRequest->getBeappName() !== $this->configuration->getBeappName()) {
             return false;
@@ -42,7 +42,7 @@ abstract class BaseWebhook
         return true;
     }
 
-    protected function checkAuthorization(Request $webhookRequest): bool
+    protected function checkAuthorization(WebhookRequest $webhookRequest): bool
     {
         if ($webhookRequest->getBeappSecret() !== $this->configuration->getBeappSecret()) {
             return false;
@@ -51,7 +51,7 @@ abstract class BaseWebhook
         return true;
     }
 
-    protected function checkOperation(Request $webhookRequest): bool
+    protected function checkOperation(WebhookRequest $webhookRequest): bool
     {
         if (!array_key_exists($webhookRequest->getOperationName(), $this->operations)) {
             return false;
@@ -61,13 +61,13 @@ abstract class BaseWebhook
     }
 
     /**
-     * @throws \BeBound\SDK\Webhook\Failure
+     * @throws \BeBound\SDK\Webhook\WebhookFailure
      */
-    protected function execute(Request $webhookRequest): string
+    protected function execute(WebhookRequest $webhookRequest): string
     {
         if (!$this->checkAuthorization($webhookRequest)) {
             $this->logger->notice('The request authorization does not match this webhook');
-            throw Failure::wrongAuthorization();
+            throw WebhookFailure::wrongAuthorization();
         }
 
         if (!$this->checkOperation($webhookRequest)) {
@@ -75,7 +75,7 @@ abstract class BaseWebhook
                 'No callable mapped to this operation',
                 ['operation' => $webhookRequest->getOperationName()]
             );
-            throw Failure::wrongOperation();
+            throw WebhookFailure::wrongOperation();
         }
 
         $operationResponse = $this->operations[$webhookRequest->getOperationName()]($webhookRequest);

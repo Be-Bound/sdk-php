@@ -35,13 +35,13 @@ class WebhookTest extends WebhookBaseTest
 
         $data = \json_decode($this->createRequestData(), true);
 
-        $request = new Webhook\Request(
+        $request = new Webhook\WebhookRequest(
             self::BEAPP_NAME,
             self::BEAPP_ID,
             self::BEAPP_VERSION,
             self::BEAPP_SECRET,
             self::USER_ID,
-            Webhook\Request::TRANSPORT_TYPE_WEB,
+            Webhook\WebhookRequest::TRANSPORT_TYPE_WEB,
             $data['operation'],
             $data['params']
         );

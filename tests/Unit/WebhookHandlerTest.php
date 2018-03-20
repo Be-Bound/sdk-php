@@ -2,7 +2,7 @@
 
 namespace Test\Unit;
 
-use BeBound\SDK\Webhook\Failure;
+use BeBound\SDK\Webhook\WebhookFailure;
 use BeBound\SDK\WebhookHandler;
 use Prophecy\Argument;
 use Psr\Http\Message\ServerRequestInterface;
@@ -70,8 +70,8 @@ class WebhookHandlerTest extends WebhookBaseTest
                     self::BEAPP_ID,
                     self::BEAPP_VERSION,
                     'notTheGoodSecret',
-                    Failure::HTTP_CODE_WRONG_AUTHORIZATION,
-                    ['error' => Failure::BB_ERROR_AUTHORIZATION]
+                    WebhookFailure::HTTP_CODE_WRONG_AUTHORIZATION,
+                    ['error' => WebhookFailure::BB_ERROR_AUTHORIZATION]
                 ],
             ]
         );

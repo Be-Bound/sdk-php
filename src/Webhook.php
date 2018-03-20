@@ -3,20 +3,20 @@
 namespace BeBound\SDK;
 
 use BeBound\SDK\Webhook\BaseWebhook;
-use BeBound\SDK\Webhook\Failure;
-use BeBound\SDK\Webhook\Request;
+use BeBound\SDK\Webhook\WebhookFailure;
+use BeBound\SDK\Webhook\WebhookRequest;
 
 class Webhook extends BaseWebhook
 {
     /**
      * @throws \Throwable
      */
-    public function run(?Request $webhookRequest = null, bool $silent = false): string
+    public function run(?WebhookRequest $webhookRequest = null, bool $silent = false): string
     {
         $this->logger->info('Received incoming request');
 
         try {
-            $webhookRequest = $webhookRequest ?? Request::fromEnvironment();
+            $webhookRequest = $webhookRequest ?? WebhookRequest::fromEnvironment();
 
             if ($webhookRequest === null || !$this->checkBeapp($webhookRequest)) {
                 $this->logger->notice('The request is not relevant for this webhook');
@@ -26,7 +26,7 @@ class Webhook extends BaseWebhook
             $payload = $this->execute($webhookRequest);
 
             return $this->sendResponse($payload, self::HTTP_CODE_OK, $silent);
-        } catch (Failure $e) {
+        } catch (WebhookFailure $e) {
             return $this->sendResponse(
                 $this->formatErrorResponse($e->getMessage()),
                 $e->getCode(),
@@ -38,8 +38,8 @@ class Webhook extends BaseWebhook
             }
 
             return $this->sendResponse(
-                $this->formatErrorResponse(Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR),
-                Failure::HTTP_CODE_INTERNAL_ERROR,
+                $this->formatErrorResponse(WebhookFailure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR),
+                WebhookFailure::HTTP_CODE_INTERNAL_ERROR,
                 $silent
             );
         }

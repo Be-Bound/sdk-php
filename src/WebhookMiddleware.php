@@ -3,8 +3,8 @@
 namespace BeBound\SDK;
 
 use BeBound\SDK\Webhook\BaseWebhook;
-use BeBound\SDK\Webhook\Failure;
-use BeBound\SDK\Webhook\Request;
+use BeBound\SDK\Webhook\WebhookFailure;
+use BeBound\SDK\Webhook\WebhookRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -26,7 +26,7 @@ class WebhookMiddleware extends BaseWebhook implements MiddlewareInterface
         $this->logger->info('Process incoming request');
 
         try {
-            $webhookRequest = Request::fromPSR7Request($request);
+            $webhookRequest = WebhookRequest::fromPSR7Request($request);
 
             if ($webhookRequest === null || !$this->checkBeapp($webhookRequest)) {
                 $this->logger->notice('The request is not relevant for this webhook');
@@ -37,7 +37,7 @@ class WebhookMiddleware extends BaseWebhook implements MiddlewareInterface
             $this->response->getBody()->write($payload);
 
             return $this->response->withStatus(self::HTTP_CODE_OK);
-        } catch (Failure $e) {
+        } catch (WebhookFailure $e) {
             $this->response->getBody()->write(
                 $this->formatErrorResponse($e->getMessage())
             );
@@ -49,10 +49,10 @@ class WebhookMiddleware extends BaseWebhook implements MiddlewareInterface
             }
 
             $this->response->getBody()->write(
-                $this->formatErrorResponse(Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR)
+                $this->formatErrorResponse(WebhookFailure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR)
             );
 
-            return $this->response->withStatus(Failure::HTTP_CODE_INTERNAL_ERROR);
+            return $this->response->withStatus(WebhookFailure::HTTP_CODE_INTERNAL_ERROR);
         }
     }
 }
