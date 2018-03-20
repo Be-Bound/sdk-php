@@ -4,9 +4,9 @@ namespace BeBound\SDK\Webhook;
 
 class WebhookFailure extends \RuntimeException
 {
-    public const HTTP_CODE_WRONG_BEAPP = 404;
+    public const HTTP_CODE_WRONG_BEAPP = 200;
     public const HTTP_CODE_WRONG_AUTHORIZATION = 401;
-    public const HTTP_CODE_OPERATION_NOT_FOUND = 400;
+    public const HTTP_CODE_OPERATION_NOT_FOUND = 200;
     public const HTTP_CODE_INTERNAL_ERROR = 500;
 
     public const BB_ERROR_REQUEST_REJECTED = 'BB_ERROR_REQUEST_REJECTED';
