@@ -141,4 +141,16 @@ abstract class WebhookBaseTest extends TestCase
 
         return $configuration;
     }
+
+    /**
+     * @return bool|resource
+     */
+    protected function createRequestStream()
+    {
+        $stream = fopen('php://temp', 'wb+');
+        fwrite($stream, $this->createRequestData());
+        rewind($stream);
+
+        return $stream;
+    }
 }
