@@ -64,7 +64,7 @@ class WebhookRequest
         );
     }
 
-    public static function fromEnvironment($stream = null, string $secret = null): ?WebhookRequest
+    public static function fromEnvironment($stream = null, ?string $secret = null): ?WebhookRequest
     {
         $stream = $stream ?? fopen('php://input', 'rb');
         $data = json_decode(fgets($stream), true);
