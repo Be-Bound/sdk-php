@@ -2,7 +2,7 @@
 
 namespace BeBound\SDK\Webhook;
 
-class Failure extends \RuntimeException
+class WebhookFailure extends \RuntimeException
 {
     public const HTTP_CODE_WRONG_BEAPP = 404;
     public const HTTP_CODE_WRONG_AUTHORIZATION = 401;

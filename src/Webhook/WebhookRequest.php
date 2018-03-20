@@ -4,7 +4,7 @@ namespace BeBound\SDK\Webhook;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class Request
+class WebhookRequest
 {
     public const TRANSPORT_TYPE_SMS = 1;
     public const TRANSPORT_TYPE_WEB = 2;
@@ -43,7 +43,7 @@ class Request
         $this->operationParams = $operationParams;
     }
 
-    public static function fromPSR7Request(ServerRequestInterface $request): ?Request
+    public static function fromPSR7Request(ServerRequestInterface $request): ?WebhookRequest
     {
         $data = json_decode($request->getBody()->getContents(), true);
         if (!$data) {
@@ -64,7 +64,7 @@ class Request
         );
     }
 
-    public static function fromEnvironment($stream = null, string $secret = null): ?Request
+    public static function fromEnvironment($stream = null, string $secret = null): ?WebhookRequest
     {
         $stream = $stream ?? fopen('php://input', 'rb');
         $data = json_decode(fgets($stream), true);

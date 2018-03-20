@@ -4,8 +4,8 @@ namespace Test;
 
 use BeBound\SDK\Configuration;
 use BeBound\SDK\Webhook\BaseWebhook;
-use BeBound\SDK\Webhook\Failure;
-use BeBound\SDK\Webhook\Request;
+use BeBound\SDK\Webhook\WebhookFailure;
+use BeBound\SDK\Webhook\WebhookRequest;
 use PHPUnit\Framework\TestCase;
 
 abstract class WebhookBaseTest extends TestCase
@@ -19,11 +19,11 @@ abstract class WebhookBaseTest extends TestCase
 
     public function provideRequest(): array
     {
-        $handlerOK = function (Request $req) {
+        $handlerOK = function (WebhookRequest $req) {
             return ['operationName' => $req->getOperationName()];
         };
 
-        $handlerBug = function (Request $req) {
+        $handlerBug = function (WebhookRequest $req) {
             throw new \RuntimeException('Oops in ' . $req->getOperationName());
         };
 
@@ -36,22 +36,22 @@ abstract class WebhookBaseTest extends TestCase
                 false,
             ],
             'Operation not found' => [
-                Failure::HTTP_CODE_OPERATION_NOT_FOUND,
-                ['error' => Failure::BB_ERROR_METHOD_NOT_FOUND],
+                WebhookFailure::HTTP_CODE_OPERATION_NOT_FOUND,
+                ['error' => WebhookFailure::BB_ERROR_METHOD_NOT_FOUND],
                 'otherOperation',
                 $handlerOK,
                 false,
             ],
             'Bugged handler in debug' => [
-                Failure::HTTP_CODE_INTERNAL_ERROR,
-                ['error' => Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
+                WebhookFailure::HTTP_CODE_INTERNAL_ERROR,
+                ['error' => WebhookFailure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
                 self::OPERATION_NAME,
                 $handlerBug,
                 true,
             ],
             'Bugged handler in production' => [
-                Failure::HTTP_CODE_INTERNAL_ERROR,
-                ['error' => Failure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
+                WebhookFailure::HTTP_CODE_INTERNAL_ERROR,
+                ['error' => WebhookFailure::BB_ERROR_UNKNOWN_USER_SPECIFIED_ERROR],
                 self::OPERATION_NAME,
                 $handlerBug,
                 false,
@@ -67,24 +67,24 @@ abstract class WebhookBaseTest extends TestCase
                 self::BEAPP_VERSION,
                 self::BEAPP_VERSION,
                 self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
+                WebhookFailure::HTTP_CODE_WRONG_BEAPP,
+                ['error' => WebhookFailure::BB_ERROR_REQUEST_REJECTED]
             ],
             'Wrong BeApp ID' => [
                 self::BEAPP_NAME,
                 42,
                 self::BEAPP_VERSION,
                 self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
+                WebhookFailure::HTTP_CODE_WRONG_BEAPP,
+                ['error' => WebhookFailure::BB_ERROR_REQUEST_REJECTED]
             ],
             'Wrong BeApp Version' => [
                 self::BEAPP_NAME,
                 self::BEAPP_ID,
                 1,
                 self::BEAPP_SECRET,
-                Failure::HTTP_CODE_WRONG_BEAPP,
-                ['error' => Failure::BB_ERROR_REQUEST_REJECTED]
+                WebhookFailure::HTTP_CODE_WRONG_BEAPP,
+                ['error' => WebhookFailure::BB_ERROR_REQUEST_REJECTED]
             ],
         ];
     }

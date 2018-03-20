@@ -32,7 +32,7 @@ class WebhookTest extends WebhookBaseTest
 
         $subject = new Webhook($configuration);
 
-        $webhookRequest = Webhook\Request::fromEnvironment($this->createRequestStream());
+        $webhookRequest = Webhook\WebhookRequest::fromEnvironment($this->createRequestStream());
         $response = $subject->run($webhookRequest);
 
         $this->assertEmpty($response);

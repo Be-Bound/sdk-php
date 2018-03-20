@@ -2,7 +2,7 @@
 
 namespace Test\Unit;
 
-use BeBound\SDK\Webhook\Request;
+use BeBound\SDK\Webhook\WebhookRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Test\WebhookBaseTest;
@@ -21,10 +21,10 @@ class RequestTest extends WebhookBaseTest
         $request->getBody()->willReturn($stream->reveal());
         $request->getHeaderLine('Authorization')->willReturn($this->createBasicAuth());
 
-        $subject = Request::fromPSR7Request($request->reveal());
+        $subject = WebhookRequest::fromPSR7Request($request->reveal());
 
         $this->assertEquals(self::OPERATION_NAME, $subject->getOperationName());
-        $this->assertEquals(Request::TRANSPORT_TYPE_WEB, $subject->getTransportType());
+        $this->assertEquals(WebhookRequest::TRANSPORT_TYPE_WEB, $subject->getTransportType());
         $this->assertEquals(self::USER_ID, $subject->getUserID());
         $this->assertEquals([], $subject->getOperationParams());
     }
@@ -36,9 +36,9 @@ class RequestTest extends WebhookBaseTest
     {
         $stream = $this->createRequestStream();
 
-        $subject = Request::fromEnvironment($stream, self::BEAPP_SECRET);
+        $subject = WebhookRequest::fromEnvironment($stream, self::BEAPP_SECRET);
 
-        $this->assertInstanceOf(Request::class, $subject);
+        $this->assertInstanceOf(WebhookRequest::class, $subject);
         $this->assertEquals(self::OPERATION_NAME, $subject->getOperationName());
     }
 }
